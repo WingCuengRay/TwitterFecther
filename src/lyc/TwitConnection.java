@@ -9,11 +9,32 @@ import java.util.concurrent.CompletableFuture;
 
 public class TwitConnection implements Connection {
     private Twitter twitter;
+    private UserBase user;
 
+    /**
+     * The constructor of TwitConnection. An instance can only be instanced by the factory
+     * @param t the new instance
+     */
     protected TwitConnection(Twitter t) {
         twitter = t;
     }
 
+    @Override
+    public UserBase getCurrentUser(){
+        if(user != null)
+            return user;
+
+        try {
+            AccountSettings account = twitter.getAccountSettings();
+            User twit_user = twitter.showUser(account.getScreenName());
+            this.user = TwitUserFacotry.getInstance().getOrCreateUser(twit_user.getId(), twit_user.getName(), twit_user.getScreenName());
+
+            return this.user;
+        } catch (TwitterException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @Override
     public List<Item> SearchPost(String keyword, int max_cnt) {
@@ -27,10 +48,8 @@ public class TwitConnection implements Connection {
 
             int i = 0;
             for (Status status : statuses) {
-                Item result = new Item(status.getUser().getName(), status.getUser().getId());
-                result.setScreen_name(status.getUser().getScreenName());
-                result.setHyperlink(status.getUser().getURL());
-                result.setText(status.getText());
+                UserBase user = TwitUserFacotry.getInstance().getOrCreateUser(status.getUser().getId(), status.getUser().getName(), status.getUser().getScreenName());
+                Item result = new Item(user, status.getText());
 
                 results.add(result);
                 if (++i == max_cnt)
@@ -41,23 +60,19 @@ public class TwitConnection implements Connection {
             return null;
         }
 
-
         return results;
     }
 
     @Override
     public List<Item> getSelfHomeLine() {
-        CompletableFuture<List<Item>> ret = new CompletableFuture<>();
-
         ArrayList<Item> results = new ArrayList<>();
 
         try {
             List<Status> statues = twitter.getHomeTimeline();
             for (Status status : statues) {
-                Item result = new Item(status.getUser().getName(), status.getUser().getId());
-                result.setScreen_name(status.getUser().getScreenName());
-                result.setHyperlink(status.getUser().getURL());
-                result.setText(status.getText());
+                UserBase user = TwitUserFacotry.getInstance().getOrCreateUser(status.getUser().getId(), status.getUser().getName(), status.getUser().getScreenName());
+                Item result = new Item(user, status.getText());
+                results.add(result);
             }
 
         } catch (TwitterException e) {
@@ -75,16 +90,14 @@ public class TwitConnection implements Connection {
 
     @Override
     public List<Item> getHomeLineById(long user_id) {
-
         ArrayList<Item> results = new ArrayList<>();
 
         try {
             List<Status> statues = twitter.getUserTimeline(user_id);
             for (Status status : statues) {
-                Item result = new Item(status.getUser().getName(), status.getUser().getId());
-                result.setScreen_name(status.getUser().getScreenName());
-                result.setHyperlink(status.getUser().getURL());
-                result.setText(status.getText());
+                UserBase user = TwitUserFacotry.getInstance().getOrCreateUser(status.getUser().getId(), status.getUser().getName(), status.getUser().getScreenName());
+                Item result = new Item(user, status.getText());
+                results.add(result);
             }
         } catch (TwitterException e) {
             e.printStackTrace();

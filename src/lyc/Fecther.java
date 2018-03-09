@@ -25,10 +25,9 @@ public class Fecther {
         System.out.println("Count: " + tweets.size());
         for(Item tweet : tweets){
             System.out.println("name: " + tweet.getUser_name());
-            System.out.println("screen name: " + tweet.getScreen_name());
             System.out.println("Id: " + tweet.getUser_id());
             System.out.println("text: " + tweet.getText());
-            System.out.println("main page: " + tweet.getHyperlink());
+            System.out.println("main page: " + tweet.getUser_link());
 
             System.out.println("\n\n--------------------------------------------------------");
         }

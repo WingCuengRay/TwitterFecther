@@ -1,12 +1,13 @@
 package lyc;
 
 import twitter4j.Twitter;
+import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
 import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterAccountFactory implements AccountFactory {
     @Override
-    public Connection createAccount(String []auths){
+    public Connection createAccount(String []auths) {
         if(auths.length != 4)
             return null;
 
@@ -20,9 +21,13 @@ public class TwitterAccountFactory implements AccountFactory {
         TwitterFactory t_factory = new TwitterFactory(cb.build());
         Twitter twitter = t_factory.getInstance();
 
-        if(twitter == null)
-            return null;
-        else
+        try {
+            twitter.verifyCredentials();
             return new TwitConnection(twitter);
+        }
+        catch(TwitterException e) {
+            //e.printStackTrace();
+            return null;
+        }
     }
 }

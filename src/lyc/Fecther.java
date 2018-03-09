@@ -1,5 +1,7 @@
 package lyc;
 
+import com.sun.xml.internal.ws.util.CompletedFuture;
+
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -14,13 +16,14 @@ public class Fecther {
         };
 
         TwitterAccountFactory t_factory = new TwitterAccountFactory();
-        AsynConnection twitConnection =  t_factory.createAccount(auths);
+        Connection twitConnection =  t_factory.createAccount(auths);
 
-        CompletableFuture<List<Result>> future_tweet = twitConnection.SearchTweet("hello", 10);
-        List<Result> tweets = future_tweet.get();
+        CompletableFuture<List<Item>> future_tweet = CompletableFuture.supplyAsync(
+                () -> twitConnection.SearchPost("hello", 10));
+        List<Item> tweets = future_tweet.get();
 
         System.out.println("Count: " + tweets.size());
-        for(Result tweet : tweets){
+        for(Item tweet : tweets){
             System.out.println("name: " + tweet.getUser_name());
             System.out.println("screen name: " + tweet.getScreen_name());
             System.out.println("Id: " + tweet.getUser_id());

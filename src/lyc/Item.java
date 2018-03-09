@@ -1,8 +1,8 @@
 package lyc;
 
-public class Result {
-    public Result(){}
-    public Result(String user_name, long user_id){
+public class Item {
+    public Item(){}
+    public Item(String user_name, long user_id){
         this.user_name = user_name;
         this.user_id = user_id;
     }

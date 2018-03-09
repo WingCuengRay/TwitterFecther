@@ -6,7 +6,7 @@ import twitter4j.conf.ConfigurationBuilder;
 
 public class TwitterAccountFactory implements AccountFactory {
     @Override
-    public AsynConnection createAccount(String []auths){
+    public Connection createAccount(String []auths){
         if(auths.length != 4)
             return null;
 
@@ -23,6 +23,6 @@ public class TwitterAccountFactory implements AccountFactory {
         if(twitter == null)
             return null;
         else
-            return new TwitAsynConnection(twitter);
+            return new TwitConnection(twitter);
     }
 }
